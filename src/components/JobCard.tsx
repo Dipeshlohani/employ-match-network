@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, DollarSign, Building, Bookmark } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface JobCardProps {
   job: {
@@ -36,9 +37,11 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             <Building className="h-6 w-6 text-blue-600" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors">
-              {job.title}
-            </h3>
+            <Link to={`/job/${job.id}`}>
+              <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors">
+                {job.title}
+              </h3>
+            </Link>
             <p className="text-gray-600 font-medium">{job.company}</p>
           </div>
         </div>
@@ -66,9 +69,11 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
 
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-500">{job.postedTime}</span>
-        <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-          Apply Now
-        </Button>
+        <Link to={`/job/${job.id}`}>
+          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+            View Details
+          </Button>
+        </Link>
       </div>
     </div>
   );
