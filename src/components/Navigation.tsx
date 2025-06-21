@@ -20,7 +20,7 @@ const Navigation = () => {
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
             <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">Find Jobs</a>
-            <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">Companies</a>
+            <Link to="/companies" className="text-gray-700 hover:text-blue-600 transition-colors">Companies</Link>
             <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">For Employers</a>
             <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors">Resources</a>
           </div>

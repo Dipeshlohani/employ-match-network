@@ -11,6 +11,7 @@ import JobDetail from "./pages/JobDetail";
 import JobSeekerDashboard from "./pages/JobSeekerDashboard";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import CompanyDirectory from "./pages/CompanyDirectory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/job-seeker-dashboard" element={<JobSeekerDashboard />} />
           <Route path="/employer-dashboard" element={<EmployerDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/companies" element={<CompanyDirectory />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
