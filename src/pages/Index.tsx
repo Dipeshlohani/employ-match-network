@@ -6,7 +6,7 @@ import TrendingJobs from '../components/TrendingJobs';
 import Footer from '../components/Footer';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, Building } from 'lucide-react';
+import { User, Building, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
@@ -27,7 +27,7 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-8 text-center">
                 <User className="h-16 w-16 text-blue-600 mx-auto mb-6" />
@@ -53,6 +53,21 @@ const Index = () => {
                 <Link to="/employer-dashboard">
                   <Button className="w-full bg-purple-600 hover:bg-purple-700">
                     Access Employer Dashboard
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-8 text-center">
+                <Shield className="h-16 w-16 text-green-600 mx-auto mb-6" />
+                <h3 className="text-2xl font-semibold mb-4">Admin Dashboard</h3>
+                <p className="text-gray-600 mb-6">
+                  Manage users, verify job listings, and view analytics
+                </p>
+                <Link to="/admin-dashboard">
+                  <Button className="w-full bg-green-600 hover:bg-green-700">
+                    Access Admin Dashboard
                   </Button>
                 </Link>
               </CardContent>
