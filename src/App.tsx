@@ -12,6 +12,9 @@ import JobSeekerDashboard from "./pages/JobSeekerDashboard";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import CompanyDirectory from "./pages/CompanyDirectory";
+import FindJobs from "./pages/FindJobs";
+import ForEmployers from "./pages/ForEmployers";
+import Resources from "./pages/Resources";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +29,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/find-jobs" element={<FindJobs />} />
+          <Route path="/for-employers" element={<ForEmployers />} />
+          <Route path="/resources" element={<Resources />} />
           <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/job-seeker-dashboard" element={<JobSeekerDashboard />} />
           <Route path="/employer-dashboard" element={<EmployerDashboard />} />
