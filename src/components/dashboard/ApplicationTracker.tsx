@@ -1,234 +1,205 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Clock, MapPin, DollarSign, Eye, Filter } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MapPin, DollarSign, Clock, Building, Eye, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ApplicationTracker = () => {
-  const [applications, setApplications] = useState([
+  const [applications] = useState([
     {
       id: '1',
-      jobTitle: 'Senior React Developer',
+      jobId: '1',
+      title: 'Senior React Developer',
       company: 'TechCorp Inc.',
       location: 'San Francisco, CA',
       salary: '$120,000 - $160,000',
-      appliedDate: '2024-01-15',
+      appliedDate: '2024-01-10',
       status: 'pending',
-      notes: 'Completed initial application, waiting for response'
+      lastUpdate: '2024-01-10'
     },
     {
       id: '2',
-      jobTitle: 'Frontend Engineer',
+      jobId: '2',
+      title: 'Frontend Engineer',
       company: 'StartupXYZ',
       location: 'Remote',
       salary: '$90,000 - $130,000',
-      appliedDate: '2024-01-10',
+      appliedDate: '2024-01-08',
       status: 'interview',
-      notes: 'Phone interview scheduled for next week'
+      lastUpdate: '2024-01-12',
+      interviewDate: '2024-01-20'
     },
     {
       id: '3',
-      jobTitle: 'UI/UX Developer',
+      jobId: '3',
+      title: 'UI/UX Developer',
       company: 'DesignPro',
       location: 'New York, NY',
       salary: '$80 - $120 /hour',
-      appliedDate: '2024-01-08',
+      appliedDate: '2024-01-05',
       status: 'rejected',
-      notes: 'Not selected for this position'
+      lastUpdate: '2024-01-08'
     },
     {
       id: '4',
-      jobTitle: 'Full Stack Developer',
-      company: 'WebSolutions',
+      jobId: '4',
+      title: 'Full Stack Developer',
+      company: 'Enterprise Solutions',
       location: 'Austin, TX',
-      salary: '$100,000 - $140,000',
-      appliedDate: '2024-01-05',
+      salary: '$110,000 - $140,000',
+      appliedDate: '2024-01-03',
       status: 'accepted',
-      notes: 'Offer received! Starting next month'
+      lastUpdate: '2024-01-15'
     }
   ]);
 
-  const [statusFilter, setStatusFilter] = useState('all');
-
-  const getStatusBadge = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
-      case 'interview':
-        return <Badge className="bg-blue-100 text-blue-800">Interview</Badge>;
-      case 'accepted':
-        return <Badge className="bg-green-100 text-green-800">Accepted</Badge>;
-      case 'rejected':
-        return <Badge className="bg-red-100 text-red-800">Rejected</Badge>;
-      default:
-        return <Badge variant="secondary">Unknown</Badge>;
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'interview': return 'bg-blue-100 text-blue-800';
+      case 'accepted': return 'bg-green-100 text-green-800';
+      case 'rejected': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const filteredApplications = statusFilter === 'all' 
-    ? applications 
-    : applications.filter(app => app.status === statusFilter);
-
-  const getStatusCount = (status: string) => {
-    return applications.filter(app => app.status === status).length;
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pending': return 'Under Review';
+      case 'interview': return 'Interview Scheduled';
+      case 'accepted': return 'Offer Received';
+      case 'rejected': return 'Not Selected';
+      default: return status;
+    }
   };
+
+  const filterApplications = (status?: string) => {
+    if (!status) return applications;
+    return applications.filter(app => app.status === status);
+  };
+
+  const ApplicationCard = ({ application }: { application: any }) => (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 mb-2">
+              <Link to={`/job/${application.jobId}`}>
+                <h3 className="text-xl font-semibold text-blue-600 hover:text-blue-800 cursor-pointer">
+                  {application.title}
+                </h3>
+              </Link>
+              <Badge className={getStatusColor(application.status)}>
+                {getStatusText(application.status)}
+              </Badge>
+            </div>
+            <div className="flex items-center space-x-4 text-gray-600 mb-2">
+              <div className="flex items-center">
+                <Building className="h-4 w-4 mr-1" />
+                {application.company}
+              </div>
+              <div className="flex items-center">
+                <MapPin className="h-4 w-4 mr-1" />
+                {application.location}
+              </div>
+            </div>
+            <div className="flex items-center text-green-600 font-semibold mb-3">
+              <DollarSign className="h-4 w-4 mr-1" />
+              {application.salary}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
+          <span>Applied on {new Date(application.appliedDate).toLocaleDateString()}</span>
+          <span>Last update: {new Date(application.lastUpdate).toLocaleDateString()}</span>
+        </div>
+
+        {application.status === 'interview' && application.interviewDate && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <div className="flex items-center space-x-2 text-blue-800">
+              <Calendar className="h-4 w-4" />
+              <span className="font-medium">Interview scheduled for {new Date(application.interviewDate).toLocaleDateString()}</span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-end">
+          <Link to={`/job/${application.jobId}`}>
+            <Button variant="outline" size="sm">
+              <Eye className="h-4 w-4 mr-2" />
+              View Job
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Application Tracker</h2>
-          <p className="text-gray-600">Track the status of your job applications</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Applications</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="interview">Interview</SelectItem>
-              <SelectItem value="accepted">Accepted</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <h2 className="text-2xl font-semibold">Application Tracker</h2>
+        <p className="text-gray-600">{applications.length} total applications</p>
       </div>
 
-      {/* Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="all">All ({applications.length})</TabsTrigger>
+          <TabsTrigger value="pending">Pending ({filterApplications('pending').length})</TabsTrigger>
+          <TabsTrigger value="interview">Interview ({filterApplications('interview').length})</TabsTrigger>
+          <TabsTrigger value="accepted">Accepted ({filterApplications('accepted').length})</TabsTrigger>
+          <TabsTrigger value="rejected">Rejected ({filterApplications('rejected').length})</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all" className="space-y-4 mt-6">
+          {applications.map((application) => (
+            <ApplicationCard key={application.id} application={application} />
+          ))}
+        </TabsContent>
+
+        <TabsContent value="pending" className="space-y-4 mt-6">
+          {filterApplications('pending').map((application) => (
+            <ApplicationCard key={application.id} application={application} />
+          ))}
+        </TabsContent>
+
+        <TabsContent value="interview" className="space-y-4 mt-6">
+          {filterApplications('interview').map((application) => (
+            <ApplicationCard key={application.id} application={application} />
+          ))}
+        </TabsContent>
+
+        <TabsContent value="accepted" className="space-y-4 mt-6">
+          {filterApplications('accepted').map((application) => (
+            <ApplicationCard key={application.id} application={application} />
+          ))}
+        </TabsContent>
+
+        <TabsContent value="rejected" className="space-y-4 mt-6">
+          {filterApplications('rejected').map((application) => (
+            <ApplicationCard key={application.id} application={application} />
+          ))}
+        </TabsContent>
+      </Tabs>
+
+      {applications.length === 0 && (
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <div className="h-3 w-3 bg-yellow-400 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-2xl font-bold">{getStatusCount('pending')}</p>
-              </div>
-            </div>
+          <CardContent className="text-center py-12">
+            <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No applications yet</h3>
+            <p className="text-gray-500 mb-4">Start applying to jobs to track your application status here.</p>
+            <Link to="/find-jobs">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Find Jobs
+              </Button>
+            </Link>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <div className="h-3 w-3 bg-blue-400 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Interview</p>
-                <p className="text-2xl font-bold">{getStatusCount('interview')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <div className="h-3 w-3 bg-green-400 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Accepted</p>
-                <p className="text-2xl font-bold">{getStatusCount('accepted')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <div className="h-3 w-3 bg-red-400 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Rejected</p>
-                <p className="text-2xl font-bold">{getStatusCount('rejected')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Applications List */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">
-            Applications ({filteredApplications.length})
-          </h3>
-        </div>
-
-        {filteredApplications.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-12">
-              <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No applications found</h3>
-              <p className="text-gray-600 mb-4">
-                {statusFilter === 'all' 
-                  ? "You haven't applied to any jobs yet"
-                  : `No applications with status: ${statusFilter}`
-                }
-              </p>
-              <Link to="/dashboard">
-                <Button>Start Applying</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {filteredApplications.map((application) => (
-              <Card key={application.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Link to={`/job/${application.id}`}>
-                          <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
-                            {application.jobTitle}
-                          </h3>
-                        </Link>
-                        {getStatusBadge(application.status)}
-                      </div>
-                      
-                      <p className="text-gray-600 font-medium mb-3">{application.company}</p>
-                      
-                      <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-600">
-                        <div className="flex items-center space-x-1">
-                          <MapPin className="h-4 w-4" />
-                          <span>{application.location}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <DollarSign className="h-4 w-4" />
-                          <span>{application.salary}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Clock className="h-4 w-4" />
-                          <span>Applied {new Date(application.appliedDate).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                      
-                      {application.notes && (
-                        <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
-                          <strong>Notes:</strong> {application.notes}
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div className="flex flex-col space-y-2 ml-4">
-                      <Link to={`/job/${application.id}`}>
-                        <Button size="sm" variant="outline" className="w-full">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Job
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

@@ -3,113 +3,133 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, MapPin, DollarSign, Clock, Users } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Plus, Search, Edit, Trash2, Eye, Users } from 'lucide-react';
 import JobPostingForm from './JobPostingForm';
+import { useToast } from "@/hooks/use-toast";
 
 const JobListings = () => {
+  const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [jobs, setJobs] = useState([
     {
       id: '1',
       title: 'Senior React Developer',
-      company: 'TechCorp Inc.',
       location: 'San Francisco, CA',
       salary: '$120,000 - $160,000',
       type: 'Full-time',
-      posted: '2024-01-15',
       status: 'active',
       applications: 24,
-      description: 'We are looking for a senior React developer to join our team...'
+      postedDate: '2024-01-10',
+      description: 'We are looking for a passionate Senior React Developer to join our dynamic team...',
+      requirements: 'Experience with React, TypeScript, and modern development practices.'
     },
     {
       id: '2',
       title: 'Frontend Engineer',
-      company: 'TechCorp Inc.',
       location: 'Remote',
       salary: '$90,000 - $130,000',
       type: 'Full-time',
-      posted: '2024-01-10',
-      status: 'active',
+      status: 'paused',
       applications: 18,
-      description: 'Join our frontend team to build amazing user experiences...'
+      postedDate: '2024-01-08',
+      description: 'Join our team as a Frontend Engineer and help build amazing user experiences...',
+      requirements: 'Strong JavaScript skills, experience with modern frameworks.'
     },
     {
       id: '3',
-      title: 'UI/UX Designer',
-      company: 'TechCorp Inc.',
+      title: 'UI/UX Developer',
       location: 'New York, NY',
-      salary: '$80,000 - $120,000',
+      salary: '$80 - $120 /hour',
       type: 'Contract',
-      posted: '2024-01-08',
-      status: 'paused',
-      applications: 12,
-      description: 'Design beautiful and intuitive user interfaces...'
+      status: 'closed',
+      applications: 45,
+      postedDate: '2024-01-05',
+      description: 'We need a talented UI/UX Developer to create beautiful interfaces...',
+      requirements: 'Portfolio showcasing UI/UX work, Figma experience preferred.'
     }
   ]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'paused': return 'bg-yellow-100 text-yellow-800';
+      case 'closed': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   const handleCreateJob = () => {
     setEditingJob(null);
     setShowForm(true);
   };
 
-  const handleEditJob = (job) => {
+  const handleEditJob = (job: any) => {
     setEditingJob(job);
     setShowForm(true);
   };
 
-  const handleDeleteJob = (jobId) => {
-    setJobs(jobs.filter(job => job.id !== jobId));
+  const handleDeleteJob = (jobId: string) => {
+    setJobs(prev => prev.filter(job => job.id !== jobId));
+    toast({
+      title: "Job Deleted",
+      description: "Job listing has been successfully deleted.",
+    });
   };
 
-  const handleFormClose = () => {
+  const handleSaveJob = (jobData: any) => {
+    if (editingJob) {
+      setJobs(prev => prev.map(job => 
+        job.id === editingJob.id ? { ...job, ...jobData } : job
+      ));
+      toast({
+        title: "Job Updated",
+        description: "Job listing has been successfully updated.",
+      });
+    } else {
+      const newJob = {
+        ...jobData,
+        id: String(jobs.length + 1),
+        applications: 0,
+        postedDate: new Date().toISOString().split('T')[0]
+      };
+      setJobs(prev => [...prev, newJob]);
+      toast({
+        title: "Job Posted",
+        description: "New job listing has been successfully created.",
+      });
+    }
     setShowForm(false);
     setEditingJob(null);
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'active':
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
-      case 'paused':
-        return <Badge className="bg-yellow-100 text-yellow-800">Paused</Badge>;
-      case 'closed':
-        return <Badge className="bg-red-100 text-red-800">Closed</Badge>;
-      default:
-        return <Badge variant="secondary">Unknown</Badge>;
-    }
-  };
+  const filteredJobs = jobs.filter(job =>
+    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    job.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (showForm) {
     return (
-      <JobPostingForm 
-        job={editingJob} 
-        onClose={handleFormClose}
-        onSave={(jobData) => {
-          if (editingJob) {
-            setJobs(jobs.map(job => job.id === editingJob.id ? { ...job, ...jobData } : job));
-          } else {
-            const newJob = {
-              ...jobData,
-              id: Date.now().toString(),
-              posted: new Date().toISOString().split('T')[0],
-              applications: 0,
-              company: 'TechCorp Inc.'
-            };
-            setJobs([newJob, ...jobs]);
-          }
-          handleFormClose();
+      <JobPostingForm
+        job={editingJob}
+        onClose={() => {
+          setShowForm(false);
+          setEditingJob(null);
         }}
+        onSave={handleSaveJob}
       />
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Job Listings</h2>
-          <p className="text-gray-600">Manage your posted jobs</p>
+          <h2 className="text-2xl font-semibold">Job Listings</h2>
+          <p className="text-gray-600">{jobs.length} total jobs posted</p>
         </div>
         <Button onClick={handleCreateJob} className="bg-blue-600 hover:bg-blue-700">
           <Plus className="h-4 w-4 mr-2" />
@@ -117,93 +137,72 @@ const JobListings = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <div className="h-3 w-3 bg-green-400 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Active Jobs</p>
-                <p className="text-2xl font-bold">{jobs.filter(job => job.status === 'active').length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <div className="h-3 w-3 bg-blue-400 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Applications</p>
-                <p className="text-2xl font-bold">{jobs.reduce((sum, job) => sum + job.applications, 0)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <div className="h-3 w-3 bg-purple-400 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Jobs</p>
-                <p className="text-2xl font-bold">{jobs.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Input
+          placeholder="Search jobs..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
       </div>
 
+      {/* Job Cards */}
       <div className="space-y-4">
-        {jobs.map((job) => (
-          <Card key={job.id} className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
+        {filteredJobs.map((job) => (
+          <Card key={job.id} className="hover:shadow-md transition-shadow">
+            <CardHeader>
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <h3 className="text-xl font-semibold text-gray-900">{job.title}</h3>
-                    {getStatusBadge(job.status)}
+                  <CardTitle className="text-xl mb-2">{job.title}</CardTitle>
+                  <div className="flex items-center space-x-4 text-gray-600 mb-2">
+                    <span>{job.location}</span>
+                    <span>•</span>
+                    <span>{job.type}</span>
+                    <span>•</span>
+                    <span>{job.salary}</span>
                   </div>
-                  
-                  <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-600">
-                    <div className="flex items-center space-x-1">
-                      <MapPin className="h-4 w-4" />
-                      <span>{job.location}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <DollarSign className="h-4 w-4" />
-                      <span>{job.salary}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Clock className="h-4 w-4" />
-                      <span>Posted {new Date(job.posted).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Users className="h-4 w-4" />
+                  <div className="flex items-center space-x-2">
+                    <Badge className={getStatusColor(job.status)}>
+                      {job.status}
+                    </Badge>
+                    <div className="flex items-center text-blue-600">
+                      <Users className="h-4 w-4 mr-1" />
                       <span>{job.applications} applications</span>
                     </div>
                   </div>
-                  
-                  <p className="text-gray-700 mb-4">{job.description}</p>
-                  <Badge variant="outline">{job.type}</Badge>
                 </div>
-                
-                <div className="flex space-x-2 ml-4">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4 line-clamp-2">{job.description}</p>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">
+                  Posted on {new Date(job.postedDate).toLocaleDateString()}
+                </span>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleEditJob(job)}
                   >
-                    <Edit className="h-4 w-4" />
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
                   </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleDeleteJob(job.id)}
                     className="text-red-600 hover:text-red-700"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Applications
                   </Button>
                 </div>
               </div>
@@ -211,6 +210,24 @@ const JobListings = () => {
           </Card>
         ))}
       </div>
+
+      {filteredJobs.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-12">
+            <Plus className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No job listings found</h3>
+            <p className="text-gray-500 mb-4">
+              {searchTerm ? 'Try adjusting your search criteria.' : 'Start by posting your first job listing.'}
+            </p>
+            {!searchTerm && (
+              <Button onClick={handleCreateJob} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Post Your First Job
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

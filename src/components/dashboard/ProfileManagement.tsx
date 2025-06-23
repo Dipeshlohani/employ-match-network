@@ -6,66 +6,83 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Upload, User, FileText, Plus, X } from 'lucide-react';
+import { Upload, User, Mail, Phone, MapPin, Briefcase, Plus, X } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 const ProfileManagement = () => {
+  const { toast } = useToast();
   const [profile, setProfile] = useState({
-    name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     email: 'john.doe@example.com',
     phone: '+1 (555) 123-4567',
     location: 'San Francisco, CA',
-    summary: 'Experienced software developer with 5+ years in web development...',
+    title: 'Senior Frontend Developer',
+    bio: 'Passionate frontend developer with 5+ years of experience in React and modern web technologies.',
+    experience: '5+ years',
+    skills: ['React', 'TypeScript', 'Node.js', 'Tailwind CSS'],
+    resume: null
   });
 
-  const [skills, setSkills] = useState(['React', 'TypeScript', 'Node.js', 'Python']);
   const [newSkill, setNewSkill] = useState('');
 
-  const [experience, setExperience] = useState([
-    {
-      id: 1,
-      title: 'Senior Frontend Developer',
-      company: 'TechCorp Inc.',
-      duration: '2022 - Present',
-      description: 'Led development of customer-facing web applications...'
-    },
-    {
-      id: 2,
-      title: 'Frontend Developer',
-      company: 'StartupXYZ',
-      duration: '2020 - 2022',
-      description: 'Developed responsive web applications using React...'
-    }
-  ]);
+  const handleInputChange = (field: string, value: string) => {
+    setProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
-  const handleAddSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
+  const addSkill = () => {
+    if (newSkill.trim() && !profile.skills.includes(newSkill.trim())) {
+      setProfile(prev => ({
+        ...prev,
+        skills: [...prev.skills, newSkill.trim()]
+      }));
       setNewSkill('');
     }
   };
 
-  const handleRemoveSkill = (skillToRemove: string) => {
-    setSkills(skills.filter(skill => skill !== skillToRemove));
+  const removeSkill = (skill: string) => {
+    setProfile(prev => ({
+      ...prev,
+      skills: prev.skills.filter(s => s !== skill)
+    }));
+  };
+
+  const handleSave = () => {
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been successfully updated.",
+    });
   };
 
   return (
     <div className="space-y-6">
-      {/* Basic Information */}
+      {/* Personal Information */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <User className="h-5 w-5" />
-            <span>Basic Information</span>
+            <span>Personal Information</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="firstName">First Name</Label>
               <Input
-                id="name"
-                value={profile.name}
-                onChange={(e) => setProfile({...profile, name: e.target.value})}
+                id="firstName"
+                value={profile.firstName}
+                onChange={(e) => handleInputChange('firstName', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                value={profile.lastName}
+                onChange={(e) => handleInputChange('lastName', e.target.value)}
               />
             </div>
             <div>
@@ -74,7 +91,7 @@ const ProfileManagement = () => {
                 id="email"
                 type="email"
                 value={profile.email}
-                onChange={(e) => setProfile({...profile, email: e.target.value})}
+                onChange={(e) => handleInputChange('email', e.target.value)}
               />
             </div>
             <div>
@@ -82,7 +99,7 @@ const ProfileManagement = () => {
               <Input
                 id="phone"
                 value={profile.phone}
-                onChange={(e) => setProfile({...profile, phone: e.target.value})}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
               />
             </div>
             <div>
@@ -90,32 +107,35 @@ const ProfileManagement = () => {
               <Input
                 id="location"
                 value={profile.location}
-                onChange={(e) => setProfile({...profile, location: e.target.value})}
+                onChange={(e) => handleInputChange('location', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="title">Professional Title</Label>
+              <Input
+                id="title"
+                value={profile.title}
+                onChange={(e) => handleInputChange('title', e.target.value)}
               />
             </div>
           </div>
           <div>
-            <Label htmlFor="summary">Professional Summary</Label>
+            <Label htmlFor="bio">Bio</Label>
             <Textarea
-              id="summary"
+              id="bio"
               rows={4}
-              value={profile.summary}
-              onChange={(e) => setProfile({...profile, summary: e.target.value})}
+              value={profile.bio}
+              onChange={(e) => handleInputChange('bio', e.target.value)}
+              placeholder="Tell us about yourself..."
             />
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            Save Changes
-          </Button>
         </CardContent>
       </Card>
 
       {/* Resume Upload */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <FileText className="h-5 w-5" />
-            <span>Resume</span>
-          </CardTitle>
+          <CardTitle>Resume</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
@@ -126,9 +146,6 @@ const ProfileManagement = () => {
             <Button variant="outline">
               Choose File
             </Button>
-            <p className="text-sm text-gray-500 mt-2">
-              Current: resume-john-doe.pdf (Uploaded 2 days ago)
-            </p>
           </div>
         </CardContent>
       </Card>
@@ -140,13 +157,15 @@ const ProfileManagement = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            {skills.map((skill) => (
-              <Badge key={skill} variant="secondary" className="flex items-center space-x-1">
-                <span>{skill}</span>
-                <X
-                  className="h-3 w-3 cursor-pointer hover:text-red-500"
-                  onClick={() => handleRemoveSkill(skill)}
-                />
+            {profile.skills.map((skill) => (
+              <Badge key={skill} variant="secondary" className="text-sm">
+                {skill}
+                <button
+                  onClick={() => removeSkill(skill)}
+                  className="ml-2 text-gray-500 hover:text-red-500"
+                >
+                  <X className="h-3 w-3" />
+                </button>
               </Badge>
             ))}
           </div>
@@ -155,44 +174,21 @@ const ProfileManagement = () => {
               placeholder="Add a skill"
               value={newSkill}
               onChange={(e) => setNewSkill(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleAddSkill()}
+              onKeyPress={(e) => e.key === 'Enter' && addSkill()}
             />
-            <Button onClick={handleAddSkill} size="sm">
+            <Button onClick={addSkill} size="sm">
               <Plus className="h-4 w-4" />
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Experience */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Work Experience</span>
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Experience
-            </Button>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {experience.map((exp) => (
-            <div key={exp.id} className="border rounded-lg p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="font-semibold text-lg">{exp.title}</h3>
-                  <p className="text-gray-600">{exp.company}</p>
-                  <p className="text-sm text-gray-500">{exp.duration}</p>
-                </div>
-                <Button variant="ghost" size="sm">
-                  Edit
-                </Button>
-              </div>
-              <p className="text-gray-700">{exp.description}</p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      {/* Save Button */}
+      <div className="flex justify-end">
+        <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
+          Save Profile
+        </Button>
+      </div>
     </div>
   );
 };

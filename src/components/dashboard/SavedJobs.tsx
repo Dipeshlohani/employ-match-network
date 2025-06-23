@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bookmark, MapPin, Clock, DollarSign, Trash2, ExternalLink } from 'lucide-react';
+import { MapPin, DollarSign, Clock, Building, Bookmark, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useToast } from "@/hooks/use-toast";
 
 const SavedJobs = () => {
+  const { toast } = useToast();
   const [savedJobs, setSavedJobs] = useState([
     {
       id: '1',
@@ -15,18 +17,9 @@ const SavedJobs = () => {
       location: 'San Francisco, CA',
       type: 'Full-time',
       salary: '$120,000 - $160,000',
-      savedDate: '2024-01-15',
-      status: 'not-applied'
-    },
-    {
-      id: '2',
-      title: 'Frontend Engineer',
-      company: 'StartupXYZ',
-      location: 'Remote',
-      type: 'Full-time',
-      salary: '$90,000 - $130,000',
-      savedDate: '2024-01-12',
-      status: 'applied'
+      description: 'We are looking for a passionate Senior React Developer to join our dynamic team...',
+      postedTime: '2 days ago',
+      savedDate: '2024-01-15'
     },
     {
       id: '3',
@@ -35,112 +28,110 @@ const SavedJobs = () => {
       location: 'New York, NY',
       type: 'Contract',
       salary: '$80 - $120 /hour',
-      savedDate: '2024-01-10',
-      status: 'not-applied'
+      description: 'We need a talented UI/UX Developer to create beautiful and intuitive interfaces...',
+      postedTime: '3 days ago',
+      savedDate: '2024-01-14'
+    },
+    {
+      id: '4',
+      title: 'Full Stack Developer',
+      company: 'Enterprise Solutions',
+      location: 'Austin, TX',
+      type: 'Full-time',
+      salary: '$110,000 - $140,000',
+      description: 'Looking for a Full Stack Developer to work on enterprise-level applications...',
+      postedTime: '5 days ago',
+      savedDate: '2024-01-12'
     }
   ]);
 
-  const handleRemoveJob = (jobId: string) => {
-    setSavedJobs(savedJobs.filter(job => job.id !== jobId));
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'applied':
-        return <Badge className="bg-green-100 text-green-800">Applied</Badge>;
-      case 'not-applied':
-        return <Badge variant="secondary">Not Applied</Badge>;
-      default:
-        return <Badge variant="secondary">Unknown</Badge>;
-    }
+  const removeSavedJob = (jobId: string) => {
+    setSavedJobs(prev => prev.filter(job => job.id !== jobId));
+    toast({
+      title: "Job Removed",
+      description: "Job has been removed from your saved jobs.",
+    });
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Saved Jobs</h2>
-          <p className="text-gray-600">Keep track of jobs you're interested in</p>
-        </div>
-        <Badge variant="outline" className="text-lg px-3 py-1">
-          {savedJobs.length} saved
-        </Badge>
+        <h2 className="text-2xl font-semibold">Saved Jobs</h2>
+        <p className="text-gray-600">{savedJobs.length} saved jobs</p>
       </div>
 
       {savedJobs.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12">
             <Bookmark className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No saved jobs yet</h3>
-            <p className="text-gray-600 mb-4">
-              Start browsing jobs and save the ones you're interested in
-            </p>
-            <Link to="/dashboard">
-              <Button>Browse Jobs</Button>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No saved jobs yet</h3>
+            <p className="text-gray-500 mb-4">Start saving jobs you're interested in to keep track of them.</p>
+            <Link to="/find-jobs">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Browse Jobs
+              </Button>
             </Link>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
           {savedJobs.map((job) => (
-            <Card key={job.id} className="hover:shadow-lg transition-shadow">
+            <Card key={job.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <Link to={`/job/${job.id}`}>
-                        <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
+                        <h3 className="text-xl font-semibold text-blue-600 hover:text-blue-800 cursor-pointer">
                           {job.title}
                         </h3>
                       </Link>
-                      {getStatusBadge(job.status)}
                     </div>
-                    
-                    <p className="text-gray-600 font-medium mb-3">{job.company}</p>
-                    
-                    <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="h-4 w-4" />
-                        <span>{job.location}</span>
+                    <div className="flex items-center space-x-4 text-gray-600 mb-2">
+                      <div className="flex items-center">
+                        <Building className="h-4 w-4 mr-1" />
+                        {job.company}
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{job.type}</span>
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        {job.location}
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <DollarSign className="h-4 w-4" />
-                        <span>{job.salary}</span>
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-1" />
+                        {job.postedTime}
                       </div>
                     </div>
-                    
-                    <p className="text-sm text-gray-500">
-                      Saved on {new Date(job.savedDate).toLocaleDateString()}
-                    </p>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <Badge variant="secondary">{job.type}</Badge>
+                      <div className="flex items-center text-green-600 font-semibold">
+                        <DollarSign className="h-4 w-4 mr-1" />
+                        {job.salary}
+                      </div>
+                    </div>
                   </div>
-                  
-                  <div className="flex flex-col space-y-2 ml-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeSavedJob(job.id)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <p className="text-gray-600 mb-4 line-clamp-2">{job.description}</p>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Saved on {new Date(job.savedDate).toLocaleDateString()}</span>
+                  <div className="space-x-2">
                     <Link to={`/job/${job.id}`}>
-                      <Button size="sm" className="w-full">
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        View Job
-                      </Button>
+                      <Button variant="outline">View Details</Button>
                     </Link>
-                    
-                    {job.status === 'not-applied' && (
-                      <Button size="sm" className="w-full bg-green-600 hover:bg-green-700">
+                    <Link to={`/job/${job.id}/apply`}>
+                      <Button className="bg-blue-600 hover:bg-blue-700">
                         Apply Now
                       </Button>
-                    )}
-                    
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleRemoveJob(job.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Remove
-                    </Button>
+                    </Link>
                   </div>
                 </div>
               </CardContent>
