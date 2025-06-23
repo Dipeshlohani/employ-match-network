@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -194,9 +193,11 @@ This role offers an excellent opportunity to work on challenging projects, colla
             {/* Apply Card */}
             <Card className="sticky top-6">
               <CardContent className="p-6">
-                <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white mb-4">
-                  Apply Now
-                </Button>
+                <Link to={`/job/${id}/apply`}>
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white mb-4">
+                    Apply Now
+                  </Button>
+                </Link>
                 <p className="text-sm text-gray-600 text-center mb-4">
                   {job.applicants} people have applied for this position
                 </p>
